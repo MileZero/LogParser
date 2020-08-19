@@ -27,7 +27,7 @@ public class DataPublisher {
             httpPost.setHeader("Content-type", "application/json");
             CloseableHttpResponse response = httpClient.execute(httpPost);
             //assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-            System.out.println(" Posted "+json);
+            //System.out.println(" Posted "+json);
         }catch (Exception ex) {
             ex.printStackTrace();
         }

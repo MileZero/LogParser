@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -18,29 +19,46 @@ public class LogParser {
     private Map<String,String> requestDataMap = new HashMap<>();
     private DataPublisher dataPublisher = new DataPublisher();
 
-    public void parseFile(String fileName) throws Exception {
+    public void parseFile(String fileName,String serviceName) throws Exception {
         File file = new File(fileName);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
-        while ((line = br.readLine()) != null) {
-            System.out.println("Raw Data:"+line);
+        while (true) {
+            line = br.readLine();
+            //System.out.println("Raw Data:"+line);
+            if(line==null) {
+                //file rotated
+                if(!file.exists()) {
+                    System.out.println("File Rotated, Closing Parser:");
+                    dataPublisher.close();
+                    return;
+                }
+                //sleep for 5 seconds and keep trying
+                System.out.println("Pausing:");
+                Thread.sleep(5000);
+                continue;
+            }
             Matcher m = LogFormat.LOG_FILE_PATTERN.matcher(line);
             if (m.find()) {
-                gatherData(line);
+                gatherData(line,serviceName);
             } else if (line.startsWith(">")) {
                 gatherRequestData(line,">");
             }  else if (line.startsWith("<")) {
                 gatherRequestData(line,"<");
             } else if (StringUtils.isNotEmpty(line)) {
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, String> map = mapper.readValue(line, Map.class);
-                requestDataMap.put("payload",line);
-                requestDataMap.putAll(map);
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    Map<String, String> map = mapper.readValue(line, Map.class);
+                    requestDataMap.put("data", line);
+                    requestDataMap.putAll(map);
+                }catch(Exception ex) {
+                    //ex.printStackTrace();
+                    System.out.println("Exception Parsing");
+                }
             } else if (StringUtils.isEmpty(line)) {
                 dataPublisher.sendPost(requestDataMap);
             }
         }
-        dataPublisher.close();
     }
 
     private void gatherRequestData(String line, String replaceChar) {
@@ -63,11 +81,11 @@ public class LogParser {
         String jsonObj = gsonObject.toJson(requestDataMap);
         Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
         String prettyJson = prettyGson.toJson(requestDataMap);
-        System.out.println(prettyJson);
+        //System.out.println(prettyJson);
         return prettyJson;
     }
 
-    private void gatherData(String line) {
+    private void gatherData(String line,String serviceName) {
         requestDataMap.clear();
         Matcher m = LogFormat.LOG_FILE_PATTERN.matcher(line);
         if (m.find( )) {
@@ -75,6 +93,7 @@ public class LogParser {
             requestDataMap.put("thread",m.group(2));
             requestDataMap.put("client_request_id",m.group(3));
             requestDataMap.put("server_request_id",m.group(4));
+            requestDataMap.put("service_name",serviceName);
         }else {
             System.out.println("NO MATCH");
         }
