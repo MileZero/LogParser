@@ -22,7 +22,7 @@ public class FileReader {
     private String BASE_PATH="/mnt/nfs-logs/logs/";
     private String SERVICE_PATH = "/SortationServices-prod/prod";
     public static void main(String[] args) throws Exception {
-        (new FileReader()).test();
+        (new FileReader()).start();
         //(new FileReader()).test();
     }
 
@@ -38,6 +38,7 @@ public class FileReader {
         String path =
                 BASE_PATH+ldt.toLocalDate()+"_"+hour+SERVICE_PATH;
         List<String> files = getLogFiles(path);
+        System.out.println(files);
         for(String fileName:files) {
             //process request logs, we can get to application logs next
             if(fileName.contains("request"))

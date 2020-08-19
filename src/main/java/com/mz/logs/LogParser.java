@@ -21,11 +21,12 @@ public class LogParser {
 
     public void parseFile(String fileName,String serviceName) throws Exception {
         File file = new File(fileName);
+        System.out.println("Reading File "+file);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
         while (true) {
             line = br.readLine();
-            //System.out.println("Raw Data:"+line);
+            System.out.println("Raw Data:"+line);
             if(line==null) {
                 //file rotated
                 if(!file.exists()) {
