@@ -29,7 +29,7 @@ public class DataPublisher {
             //assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
             //System.out.println(" Posted "+json);
         }catch (Exception ex) {
-            ex.printStackTrace();
+           System.out.println(" Write failed ");
         }
     }
 
@@ -39,7 +39,7 @@ public class DataPublisher {
         String jsonObj = gsonObject.toJson(requestDataMap);
         Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
         String prettyJson = prettyGson.toJson(requestDataMap);
-        System.out.println(prettyJson);
+        //System.out.println(prettyJson);
         return prettyJson;
     }
 

@@ -24,9 +24,11 @@ public class LogParser {
         System.out.println("Reading File "+file);
         BufferedReader br = new BufferedReader(new FileReader(file));
         String line;
+        int lineNumber=0;
         while (true) {
             line = br.readLine();
-            System.out.println("Raw Data:"+line);
+            lineNumber++;
+            //System.out.println("Raw Data:"+line);
             if(line==null) {
                 //file rotated
                 if(!file.exists()) {
@@ -35,7 +37,7 @@ public class LogParser {
                     return;
                 }
                 //sleep for 5 seconds and keep trying
-                System.out.println("Pausing:");
+                //System.out.println("Pausing:");
                 Thread.sleep(5000);
                 continue;
             }
@@ -53,8 +55,9 @@ public class LogParser {
                     requestDataMap.put("data", line);
                     requestDataMap.putAll(map);
                 }catch(Exception ex) {
+                    //we parse json objects in request, not list of json array thats in response, so just ignore for now
                     //ex.printStackTrace();
-                    System.out.println("Exception Parsing");
+                    //System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
                 }
             } else if (StringUtils.isEmpty(line)) {
                 dataPublisher.sendPost(requestDataMap);
