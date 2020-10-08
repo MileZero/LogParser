@@ -43,7 +43,11 @@ public class DataPublisher {
         return prettyJson;
     }
 
-    public void close() throws IOException {
-        httpClient.close();
+    public void close() {
+        try {
+            httpClient.close();
+        }catch (IOException ex) {
+            System.out.println(" Exception closing connection () ");
+        }
     }
 }

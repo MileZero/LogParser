@@ -34,11 +34,11 @@ public class LogParser {
                 if(!file.exists()) {
                     System.out.println("File Rotated, Closing Parser:");
                     dataPublisher.close();
-                    return;
+                    System.exit(0);
                 }
                 //sleep for 5 seconds and keep trying
                 //System.out.println("Pausing:");
-                Thread.sleep(5000);
+                Thread.sleep(1000);
                 continue;
             }
             Matcher m = LogFormat.LOG_FILE_PATTERN.matcher(line);
