@@ -10,4 +10,6 @@ public class LogFormat {
     public static String serverRequestId = "\\s*(\\w*-\\w*-\\w*-\\w*-\\w*)";
     public static String msgReceived = "*\\s-\\s*(w*)";
     public static Pattern LOG_FILE_PATTERN = Pattern.compile(datePattern + threadNumber + clientRequestId + serverRequestId + msgReceived);
+    public static String STACK_TRACE_PREFIX="Exception";
+    public static String STACK_TRACE_CONTINUE="at";
 }

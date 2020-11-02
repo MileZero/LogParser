@@ -19,7 +19,55 @@ public class LogParser {
     private Map<String,String> requestDataMap = new HashMap<>();
     private DataPublisher dataPublisher = new DataPublisher();
 
-    public void parseFile(String fileName,String serviceName) throws Exception {
+    public void parseFile(String fileName,String serviceName,boolean requestFile) throws Exception{
+        //process request logs or application logs
+        if(requestFile)
+            parseReqLogFile(fileName,serviceName);
+        else
+            parseAppLogFile(fileName,serviceName);
+    }
+    public void parseAppLogFile(String fileName,String serviceName) throws Exception {
+        File file = new File(fileName);
+        //System.out.println("Reading App Log File "+fileName);
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String line;
+        String stackTrace="";
+        boolean hasStackTrace=false;
+        while (true) {
+            line = br.readLine();
+            if(line==null) {
+                //file rotated
+                if(!file.exists()) {
+                    System.out.println("File Rotated, Closing Parser:");
+                    dataPublisher.close();
+                    System.exit(0);
+                }
+                //sleep for 5 seconds and keep trying
+                //System.out.println("Pausing:");
+                Thread.sleep(1000);
+                continue;
+            }
+            if(line.contains(LogFormat.STACK_TRACE_PREFIX)||line.contains(LogFormat.STACK_TRACE_CONTINUE)) {
+                hasStackTrace=true;
+                requestDataMap.put("service_name",serviceName);
+                //System.out.println("Raw Data:" + line);
+                stackTrace = stackTrace + "\n" + line;
+            }
+            else {
+                if(hasStackTrace) {
+                    //System.out.println(stackTrace);
+                    requestDataMap.put("file_type", "error_logs");
+                    requestDataMap.put("stack_trace", stackTrace);
+                    dataPublisher.sendPost(requestDataMap);
+                    stackTrace = "";
+                    requestDataMap.clear();
+                    hasStackTrace = false;
+                }
+            }
+        }
+    }
+
+    public void parseReqLogFile(String fileName,String serviceName) throws Exception {
         File file = new File(fileName);
         System.out.println("Reading File "+file);
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -102,5 +150,4 @@ public class LogParser {
             System.out.println("NO MATCH");
         }
     }
-
 }

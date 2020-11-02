@@ -20,12 +20,6 @@ import java.util.stream.Stream;
 public class FileReader {
     private String BASE_PATH="/mnt/nfs-logs/logs/";
 
-    /*@Value("${logparser.environment}")
-    private String environment;
-
-    @Value("#{'${logparser.enabledServices}'.split(',')}")
-    private List<String> enabledServicesList;*/
-
     //e.g. "/Tesseract-prod/prod"
     private List<String> getAllServicesPath() {
         String environment="";
@@ -50,24 +44,14 @@ public class FileReader {
         return pathList;
     }
 
-    /*private List<String> SERVICE_PATH_LIST = Arrays.asList(
-            "/Tesseract-prod/prod",
-            "/switchboard-prod/prod",
-            "/Alamo-Prod/prod",
-            "/SortationServices-prod/prod",
-            "/oegr-prod/prod",
-            "/hei-prod/prod",
-            "/lmx-prod/prod",
-            "/messenger-prod/prod"
-    );*/
-
     public static void main(String[] args) throws Exception {
+        //(new FileReader()).test();
         (new FileReader()).start();
     }
 
     private void test() throws Exception {
-        (new LogParser()).parseFile("/work/MZ/logs/test.log",
-                "test-service");
+        (new LogParser()).parseFile("/work/MZ/LogParser/msgr-app.log",
+                "test-service",false);
     }
 
     private void start() {
@@ -80,16 +64,13 @@ public class FileReader {
             List<String> files = getLogFiles(path);
             System.out.println(files);
             for (String fileName : files) {
-                //process request logs, we can get to application logs next
-                if (fileName.contains("request")) {
-                    CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> {
-                        try {
-                            (new LogParser()).parseFile(fileName, serviceName.toLowerCase());
-                        }catch (Exception ex) {
-                            System.out.println(" Exception in Start() ");
-                        }
-                    });
-                }
+                CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> {
+                    try {
+                        (new LogParser()).parseFile(fileName, serviceName.toLowerCase(),fileName.contains("request"));
+                    }catch (Exception ex) {
+                        System.out.println(" Exception in Start() ");
+                    }
+                });
             }
         }
     }
