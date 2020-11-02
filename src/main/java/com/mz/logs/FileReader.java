@@ -44,8 +44,8 @@ public class FileReader {
         System.out.println(" Env:" +environment);
         List<String> pathList = new ArrayList<>();
         for(String serviceName:enabledServicesList) {
-            pathList.add("/"+serviceName+"-"+environment+"/"+environment);
-            System.out.println("/"+serviceName+"-"+environment+"/"+environment);
+            pathList.add("/"+serviceName+"/"+environment);
+            System.out.println("/"+serviceName+"/"+environment);
         }
         return pathList;
     }
