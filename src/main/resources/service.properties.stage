@@ -1,0 +1,15 @@
+logparser.environment=stage
+
+logparser.enabledServices=Tesseract-stage,\
+  switchboard-stage,\
+  Alamo-stage,\
+  SortationServices-stage,\
+  oegr-stage,\
+  hei-stage,\
+  lmx-stage,\
+  messenger-stage,\
+  ReportsGen-stage,\
+  caos-stage,\
+  qilin-stage
+
+graylog.url=http://graylog.stage.milezero.com:8080/gelf

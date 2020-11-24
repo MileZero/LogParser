@@ -19,14 +19,14 @@ public class LogParser {
     private Map<String,String> requestDataMap = new HashMap<>();
     private DataPublisher dataPublisher = new DataPublisher();
 
-    public void parseFile(String fileName,String serviceName,boolean requestFile) throws Exception{
+    public void parseFile(String fileName,String serviceName,boolean requestFile,String grayLogUrl) throws Exception{
         //process request logs or application logs
         if(requestFile)
-            parseReqLogFile(fileName,serviceName);
+            parseReqLogFile(fileName,serviceName,grayLogUrl);
         else
-            parseAppLogFile(fileName,serviceName);
+            parseAppLogFile(fileName,serviceName,grayLogUrl);
     }
-    public void parseAppLogFile(String fileName,String serviceName) throws Exception {
+    public void parseAppLogFile(String fileName,String serviceName,String grayLogUrl) throws Exception {
         File file = new File(fileName);
         //System.out.println("Reading App Log File "+fileName);
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -58,7 +58,7 @@ public class LogParser {
                     //System.out.println(stackTrace);
                     requestDataMap.put("file_type", "error_logs");
                     requestDataMap.put("stack_trace", stackTrace);
-                    dataPublisher.sendPost(requestDataMap);
+                    dataPublisher.sendPost(requestDataMap,grayLogUrl);
                     stackTrace = "";
                     requestDataMap.clear();
                     hasStackTrace = false;
@@ -67,7 +67,7 @@ public class LogParser {
         }
     }
 
-    public void parseReqLogFile(String fileName,String serviceName) throws Exception {
+    public void parseReqLogFile(String fileName,String serviceName,String grayLogUrl) throws Exception {
         File file = new File(fileName);
         System.out.println("Reading File "+file);
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -101,14 +101,15 @@ public class LogParser {
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, String> map = mapper.readValue(line, Map.class);
                     requestDataMap.put("data", line);
-                    requestDataMap.putAll(map);
+                    //requestDataMap.putAll(map);
                 }catch(Exception ex) {
                     //we parse json objects in request, not list of json array thats in response, so just ignore for now
                     //ex.printStackTrace();
-                    //System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
+                    requestDataMap.put("data", line);
+                    System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
                 }
             } else if (StringUtils.isEmpty(line)) {
-                dataPublisher.sendPost(requestDataMap);
+                dataPublisher.sendPost(requestDataMap,grayLogUrl);
             }
         }
     }
@@ -122,7 +123,7 @@ public class LogParser {
         else
             tokens = line.split(":");
         if(tokens.length>1)
-            requestDataMap.put(tokens[0].trim(),tokens[1].trim());
+            requestDataMap.put(tokens[0].trim().toLowerCase(),tokens[1].trim());
         else
             requestDataMap.put("response_code",tokens[0].trim());
     }

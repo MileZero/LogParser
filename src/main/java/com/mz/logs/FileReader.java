@@ -1,6 +1,7 @@
 package com.mz.logs;
 
 import com.mz.logs.utils.DateTimeUtils;
+import com.mz.logs.utils.EnvProperties;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
@@ -18,30 +19,33 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileReader {
-    private String BASE_PATH="/mnt/nfs-logs/logs/";
+    private String BASE_PATH = "/mnt/nfs-logs/logs/";
 
     //e.g. "/Tesseract-prod/prod"
-    private List<String> getAllServicesPath() {
-        String environment="";
-        List<String> enabledServicesList=new ArrayList<>();
+    private EnvProperties getEnvProperties() {
+        List<String> enabledServicesList = new ArrayList<>();
+        EnvProperties envProperties = new EnvProperties();
         try (InputStream input = FileReader.class.getClassLoader().getResourceAsStream("service.properties")) {
             Properties prop = new Properties();
             prop.load(input);
-            environment = prop.getProperty("logparser.environment");
-            String allServices = prop.getProperty("logparser.enabledServices");
-            for(String str:allServices.split(",")) {
+            envProperties = EnvProperties.builder()
+                    .environment(prop.getProperty("logparser.environment"))
+                    .allServices(prop.getProperty("logparser.enabledServices"))
+                    .grayLogUrl(prop.getProperty("graylog.url"))
+                    .build();
+            for (String str : envProperties.getAllServices().split(","))
                 enabledServicesList.add(str);
-            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-        System.out.println(" Env:" +environment);
+        System.out.println(" Env:" + envProperties.getEnvironment());
         List<String> pathList = new ArrayList<>();
-        for(String serviceName:enabledServicesList) {
-            pathList.add("/"+serviceName+"/"+environment);
-            System.out.println("/"+serviceName+"/"+environment);
+        for (String serviceName : enabledServicesList) {
+            pathList.add("/" + serviceName + "/" + envProperties.getEnvironment());
+            System.out.println("/" + serviceName + "/" + envProperties.getEnvironment());
         }
-        return pathList;
+        envProperties.setAllServicesPath(enabledServicesList);
+        return envProperties;
     }
 
     public static void main(String[] args) throws Exception {
@@ -50,12 +54,13 @@ public class FileReader {
     }
 
     private void test() throws Exception {
-        (new LogParser()).parseFile("/work/MZ/LogParser/msgr-app.log",
-                "test-service",false);
+        (new LogParser()).parseFile("/work/MZ/LogParser/test-req-1.log",
+                "test-service", true,"http://graylog.prod.milezero.com:8080/gelf");
     }
 
     private void start() {
-        for(String servicePath:getAllServicesPath()) {
+        EnvProperties envProperties = getEnvProperties();
+        for (String servicePath : envProperties.getAllServicesPath()) {
             String serviceName = servicePath.substring(servicePath.indexOf('/') + 1, servicePath.lastIndexOf('/'));
             LocalDateTime ldt = DateTimeUtils.getDateTimeUTC();
             String hour = ldt.getHour() > 9 ? "" + ldt.getHour() : "0" + ldt.getHour();
@@ -66,8 +71,11 @@ public class FileReader {
             for (String fileName : files) {
                 CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> {
                     try {
-                        (new LogParser()).parseFile(fileName, serviceName.toLowerCase(),fileName.contains("request"));
-                    }catch (Exception ex) {
+                        (new LogParser()).parseFile(fileName,
+                                serviceName.toLowerCase(),
+                                fileName.contains("request"),
+                                envProperties.getGrayLogUrl());
+                    } catch (Exception ex) {
                         System.out.println(" Exception in Start() ");
                     }
                 });
@@ -80,7 +88,7 @@ public class FileReader {
             Stream<Path> pathStream = Files.walk(Paths.get(folder));
             List<String> filesList = pathStream.filter(Files::isRegularFile).map(x -> x.toString()).collect(Collectors.toList());
             return filesList;
-        }catch(IOException ex) {
+        } catch (IOException ex) {
             System.out.println(" Exception getLogFiles() ");
             ex.printStackTrace();
         }
