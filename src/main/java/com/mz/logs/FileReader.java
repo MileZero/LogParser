@@ -44,18 +44,18 @@ public class FileReader {
             pathList.add("/" + serviceName + "/" + envProperties.getEnvironment());
             System.out.println("/" + serviceName + "/" + envProperties.getEnvironment());
         }
-        envProperties.setAllServicesPath(enabledServicesList);
+        envProperties.setAllServicesPath(pathList);
         return envProperties;
     }
 
     public static void main(String[] args) throws Exception {
         //(new FileReader()).test();
-        (new FileReader()).start();
+            (new FileReader()).start();
     }
 
     private void test() throws Exception {
         (new LogParser()).parseFile("/work/MZ/LogParser/test-req-1.log",
-                "test-service", true,"http://graylog.prod.milezero.com:8080/gelf");
+                "test-service", true,"http://graylog.stage.milezero.com:8080/gelf");
     }
 
     private void start() {

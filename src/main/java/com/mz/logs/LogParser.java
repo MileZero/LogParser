@@ -15,6 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
+/*
+ * 1. Dont include GET responses, too large sometimes
+ * 2. Log itself contains partial response only
+ * 3. We run on single x3.large box with 32G Mem / 500G diskspace, unnecessary payload will cause burden on elastic search
+ * 4. Messages will not get posted to ES
+ * 5. Error on graylog: Journal utilization is too high and may go over the limit soon
+ */
 public class LogParser {
     private Map<String,String> requestDataMap = new HashMap<>();
     private DataPublisher dataPublisher = new DataPublisher();
@@ -105,7 +112,7 @@ public class LogParser {
                 }catch(Exception ex) {
                     //we parse json objects in request, not list of json array thats in response, so just ignore for now
                     //ex.printStackTrace();
-                    requestDataMap.put("data", line);
+                    requestDataMap.put("data", "not-available");
                     System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
                 }
             } else if (StringUtils.isEmpty(line)) {
@@ -123,7 +130,7 @@ public class LogParser {
         else
             tokens = line.split(":");
         if(tokens.length>1)
-            requestDataMap.put(tokens[0].trim().toLowerCase(),tokens[1].trim());
+            requestDataMap.put(tokens[0].trim().toLowerCase(),trimPath(tokens[1].trim()));
         else
             requestDataMap.put("response_code",tokens[0].trim());
     }
@@ -150,5 +157,14 @@ public class LogParser {
         }else {
             System.out.println("NO MATCH");
         }
+    }
+
+    //POST http://internal-SortationServices-prod-1528076527.us-west-2.elb.amazonaws.com/SortationServices-war/api/package
+    //trim to /api/package
+    private String trimPath(String url) {
+        if (url.indexOf("/api/")!=-1)
+            return url.substring(url.indexOf("/api/"),url.length());
+
+        return url;
     }
 }
