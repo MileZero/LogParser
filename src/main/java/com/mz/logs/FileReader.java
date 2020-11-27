@@ -1,8 +1,6 @@
 package com.mz.logs;
 
-import com.mz.logs.utils.DateTimeUtils;
-import com.mz.logs.utils.EnvProperties;
-import org.springframework.beans.factory.annotation.Value;
+import com.mz.logs.utils.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +16,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileReader {
-    private String BASE_PATH = "/mnt/nfs-logs/logs/";
+    EnvProperties envProperties;
 
     //e.g. "/Tesseract-prod/prod"
     private EnvProperties getEnvProperties() {
@@ -47,39 +44,50 @@ public class FileReader {
         envProperties.setAllServicesPath(pathList);
         return envProperties;
     }
-
     public static void main(String[] args) throws Exception {
         //(new FileReader()).test();
-            (new FileReader()).start();
+        (new FileReader()).start();
     }
 
     private void test() throws Exception {
         (new LogParser()).parseFile("/work/MZ/LogParser/test-req-1.log",
-                "test-service", true,"http://graylog.stage.milezero.com:8080/gelf");
+                "test-service", true, "http://graylog.stage.milezero.com:8080/gelf");
     }
 
     private void start() {
-        EnvProperties envProperties = getEnvProperties();
+        this.envProperties = EnvUtils.getEnvProperties();
+        List<String> failurePaths = new ArrayList<>();
         for (String servicePath : envProperties.getAllServicesPath()) {
-            String serviceName = servicePath.substring(servicePath.indexOf('/') + 1, servicePath.lastIndexOf('/'));
-            LocalDateTime ldt = DateTimeUtils.getDateTimeUTC();
-            String hour = ldt.getHour() > 9 ? "" + ldt.getHour() : "0" + ldt.getHour();
-            String path =
-                    BASE_PATH + ldt.toLocalDate() + "_" + hour + servicePath;
+            String serviceName = ParserUtils.getServiceName(servicePath);
+            String path = ParserUtils.getServiceFullPath(servicePath);
             List<String> files = getLogFiles(path);
-            System.out.println(files);
-            for (String fileName : files) {
-                CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> {
-                    try {
-                        (new LogParser()).parseFile(fileName,
-                                serviceName.toLowerCase(),
-                                fileName.contains("request"),
-                                envProperties.getGrayLogUrl());
-                    } catch (Exception ex) {
-                        System.out.println(" Exception in Start() ");
-                    }
-                });
+            if (files == null) {
+                failurePaths.add(servicePath);
+                continue;
             }
+            System.out.println(files);
+            parse(files, serviceName);
+        }
+        if (EnvUtils.isStage(envProperties.getEnvironment())) {
+            for (String servicePath : failurePaths) {
+                RetryWorker worker = new RetryWorker((servicePath));
+                worker.start();
+            }
+        }
+    }
+
+    private void parse(List<String> files, String serviceName) {
+        for (String fileName : files) {
+            CompletableFuture<Void> cf = CompletableFuture.runAsync(() -> {
+                try {
+                    (new LogParser()).parseFile(fileName,
+                            serviceName.toLowerCase(),
+                            fileName.contains("request"),
+                            envProperties.getGrayLogUrl());
+                } catch (Exception ex) {
+                    System.out.println(" Exception in Start() ");
+                }
+            });
         }
     }
 
@@ -88,11 +96,37 @@ public class FileReader {
             Stream<Path> pathStream = Files.walk(Paths.get(folder));
             List<String> filesList = pathStream.filter(Files::isRegularFile).map(x -> x.toString()).collect(Collectors.toList());
             return filesList;
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.out.println(" Exception getLogFiles() ");
-            ex.printStackTrace();
+            //ex.printStackTrace();
         }
         return null;
     }
 
+    class RetryWorker extends Thread {
+        String servicePath;
+        public RetryWorker(String servicePath) {
+            this.servicePath = servicePath;
+        }
+        @Override
+        public void run() {
+            while (true) {
+                try {
+                    String serviceName = ParserUtils.getServiceName(servicePath);
+                    String path = ParserUtils.getServiceFullPath(servicePath);
+                    List<String> files = getLogFiles(path);
+                    if (files == null) {
+                        System.out.println(" Log file not yet available for "+path+", sleeping 2m and retrying");
+                        Thread.sleep(1000*60*2);
+                        continue;
+                    }
+                    parse(files,serviceName);
+                    break;
+                } catch (Exception ex) {
+                    System.out.println(" Retry Worker Exception ");
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
 }

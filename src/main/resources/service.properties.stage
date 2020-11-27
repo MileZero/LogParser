@@ -1,15 +1,38 @@
 logparser.environment=stage
 
-logparser.enabledServices=Tesseract-stage,\
-  switchboard-stage,\
-  Alamo-stage,\
-  SortationServices-stage,\
-  oegr-stage,\
-  hei-stage,\
-  lmx-stage,\
-  messenger-stage,\
-  ReportsGen-stage,\
-  caos-stage,\
-  qilin-stage
+logparser.enabledServices=aboriginal-stage,\
+    gazetteer-stage,\
+    SortationServices-stage,\
+    packageseeker-listener-stage,\
+    gazetteer-listener-stage,\
+    mvb-backend-stage,\
+    itinerary-seeker-stage,\
+    lmx-stage,\
+    switchboard-backend-stage,\
+    EARP-backend-stage,\
+    qilin-stage,\
+    EARP-stage,\
+    retail-config-stage,\
+    rad-staging,\
+    redeux-stage,\
+    Tesseract-backend-stage,\
+    Tesseract-stage,\
+    switchboard-stage,\
+    worldview-stage2,\
+    Alamo-Stage,\
+    external-notification-stage,\
+    worldListener-stage,\
+    lockbox-stage,\
+    oegr-staging,\
+    finance-stage,\
+    agenda-stage,\
+    edim-backend-stage,\
+    edim-stage,\
+    hei-stage,\
+    Transit-stage,\
+    jarvis-stage,\
+    caos-staging,\
+    messenger-stage,\
+    ReportsGen-stage
 
 graylog.url=http://graylog.stage.milezero.com:8080/gelf

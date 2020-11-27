@@ -27,7 +27,7 @@ public class LogParser {
     private DataPublisher dataPublisher = new DataPublisher();
 
     public void parseFile(String fileName,String serviceName,boolean requestFile,String grayLogUrl) throws Exception{
-        //process request logs or application logs
+        System.out.println(" In Parse File ");
         if(requestFile)
             parseReqLogFile(fileName,serviceName,grayLogUrl);
         else

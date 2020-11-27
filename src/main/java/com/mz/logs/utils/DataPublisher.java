@@ -26,8 +26,8 @@ public class DataPublisher {
             httpPost.setHeader("Content-type", "application/json");
             CloseableHttpResponse response = httpClient.execute(httpPost);
             //assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-            System.out.println(" Posting to " +grayLogUrl+" for "+requestDataMap.get("service_name"));
-            System.out.println(" Posted "+json);
+            //System.out.println(" Posting to " +grayLogUrl+" for "+requestDataMap.get("service_name"));
+            //System.out.println(" Posted "+json);
         }catch (Exception ex) {
            System.out.println(" Write failed ");
         }
