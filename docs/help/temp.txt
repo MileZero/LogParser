@@ -1,0 +1,18 @@
+#stage
+scp -i /work/MZ/aws/rishi.pem /work/MZ/LogParser/target/LogParser-jar-with-dependencies.jar rishi@10.0.2.97:/home/rishi/LogParser-jar-with-dependencies.jar
+
+#prod
+scp -i /work/MZ/aws/rishi.pem /work/MZ/LogParser/target/LogParser-jar-with-dependencies.jar rishi@10.1.27.144:/home/rishi/LogParser-jar-with-dependencies.jar
+graylog: ssh -v -i  /work/MZ/aws/rishi.pem  rishi@10.1.23.180
+
+
+
+#issues with load
+1. Stop incoming messages. Kill logparser
+2. Restart elastic search
+3. Restart Graylog server
+4. If needed recalculate index ranges
+
+#change xms xmx for elastic search
+
+

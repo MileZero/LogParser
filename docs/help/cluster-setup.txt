@@ -1,0 +1,50 @@
+#Basics
+https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html#unicast.hosts
+
+#from elasticsearch.yml for cluster setup
+discovery.seed_hosts:
+- 192.168.1.10:9300
+- 192.168.1.11
+- seeds.mydomain.com
+- [0:0:0:0:0:ffff:c0a8:10c]:9301
+cluster.initial_master_nodes:
+- master-node-a
+- master-node-b
+- master-node-c
+
+#node names are appropriately configured in each host node.name
+node.name: master-node-a
+
+
+#nodes
+ssh -v -i  /work/MZ/aws/rishi.pem  rishi@10.1.23.236
+ssh -v -i  /work/MZ/aws/rishi.pem  rishi@10.1.23.65
+ssh -v -i  /work/MZ/aws/rishi.pem  rishi@10.1.23.180 (master)
+ssh -v -i  /work/MZ/aws/rishi.pem  rishi@10.1.20.40
+
+#es change vm
+sudo nano /etc/elasticsearch/jvm.options
+
+#testing
+rishi@graylog-prod3:~$ sudo cp elasticsearch.yml.backup /etc/elasticsearch/elasticsearch.yml
+rishi@graylog-prod3:~$ sudo cp server.conf.recent /etc/graylog/server/server.conf
+rishi@graylog-prod3:~$ sudo systemctl stop graylog-server
+rishi@graylog-prod3:~$ sudo systemctl start  graylog-server
+rishi@graylog-prod3:~$ sudo cp elasticsearch.yml.backup /etc/elasticsearch/elasticsearch.yml
+rishi@graylog-prod3:~$ /usr/local/share/elasticsearch/bin/service/elasticsearch restart
+
+#backup
+scp -i /work/MZ/aws/rishi.pem ./docs/config-backup/elasticsearch.yml  rishi@10.1.23.227:/home/rishi/
+
+sudo cp server.conf /etc/graylog/server/server.conf
+sudo cp elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
+
+
+#links
+links 10.1.23.180:8080/gettingstarted
+
+#elastic search
+sudo systemctl stop elasticsearch.service
+
+#graylog
+sudo systemctl restart graylog-server
