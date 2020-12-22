@@ -57,22 +57,32 @@ public class FileReader {
     private void start() {
         this.envProperties = EnvUtils.getEnvProperties();
         List<String> failurePaths = new ArrayList<>();
+        List<String> failurePathsAppLog = new ArrayList<>();
         for (String servicePath : envProperties.getAllServicesPath()) {
             String serviceName = ParserUtils.getServiceName(servicePath);
             String path = ParserUtils.getServiceFullPath(servicePath);
             List<String> files = getLogFiles(path);
+            //no log files yet, or app log yet
             if (files == null) {
                 failurePaths.add(servicePath);
                 continue;
             }
+            //app logs created only on exceptions
+            if(!files.contains("application"))
+                failurePathsAppLog.add(servicePath);
             System.out.println(files);
             parse(files, serviceName);
         }
         if (EnvUtils.isStage(envProperties.getEnvironment())) {
-            for (String servicePath : failurePaths) {
-                RetryWorker worker = new RetryWorker((servicePath));
-                worker.start();
-            }
+            retryFailures(failurePaths,true);
+            retryFailures(failurePathsAppLog,false);
+        }
+    }
+
+    private void retryFailures(List<String> fileNames,boolean parseAllFiles) {
+        for (String servicePath : fileNames) {
+            RetryWorker worker = new RetryWorker(servicePath,parseAllFiles);
+            worker.start();
         }
     }
 
@@ -105,8 +115,10 @@ public class FileReader {
 
     class RetryWorker extends Thread {
         String servicePath;
-        public RetryWorker(String servicePath) {
+        boolean parseAllFiles;
+        public RetryWorker(String servicePath,boolean parseAllFiles) {
             this.servicePath = servicePath;
+            this.parseAllFiles=parseAllFiles;
         }
         @Override
         public void run() {
@@ -120,7 +132,12 @@ public class FileReader {
                         Thread.sleep(1000*60*2);
                         continue;
                     }
-                    parse(files,serviceName);
+                    if(parseAllFiles)
+                        parse(files,serviceName);
+                    else {
+                        parse(files.stream().filter(s->s.contains("applicaiton")).collect(Collectors.toList()),
+                                serviceName);
+                    }
                     break;
                 } catch (Exception ex) {
                     System.out.println(" Retry Worker Exception ");
