@@ -14,21 +14,22 @@ logparser.enabledServices= messenger-prod,\
     hei-prod,\
     oegr-prod,\
     EARP-prod,\
-    switchboard-prod
-
-logparser.notEnabledServicesList=gazetteer-prod,\
+    switchboard-prod,\
+    gazetteer-prod,\
     edim-prod,\
     tathastu-prod,\
+    jarvis-prod,\
+    redeux-prod,\
+    ReportsGen-prod
+
+logparser.notEnabledServicesList=
     geocoder-prod,\
     edim-backend-prod,\
     mileview-prod,\
     mvb-backend-prod,\
     finance-prod,\
     worldListener-prod,\
-    redeux-prod,\
     mvb-frontend-prod,\
-    jarvis-prod,\
-    ReportsGen-prod,\
     external-notification-prod
 
 graylog.url=http://graylog.prod.milezero.com:8080/gelf
