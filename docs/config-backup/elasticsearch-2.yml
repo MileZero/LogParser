@@ -68,7 +68,7 @@ network.host: 10.1.21.11
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-discovery.zen.ping.unicast.hosts: ["10.1.23.227", "10.1.21.11","10.1.27.54"]
+discovery.zen.ping.unicast.hosts: ["10.1.23.227","10.1.21.11","10.1.27.54","10.1.18.254","10.1.23.128","10.1.25.52"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #

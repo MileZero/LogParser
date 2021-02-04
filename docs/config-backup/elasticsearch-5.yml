@@ -21,7 +21,7 @@ cluster.name: graylog
 #
 # Use a descriptive name for the node:
 #
-node.name: node-3
+node.name: node-5
 node.data: true
 #define nodes 1 2,4 data nodes:
 #node.data: true
@@ -56,7 +56,7 @@ path.logs: /var/log/elasticsearch
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: 10.1.27.54
+network.host: 10.1.23.128
 #
 # Set a custom port for HTTP:
 #
