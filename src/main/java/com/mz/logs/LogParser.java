@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mz.logs.utils.DataPublisher;
+import com.mz.logs.utils.EnvProperties;
 import com.mz.logs.utils.LogFormat;
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,10 +27,11 @@ public class LogParser {
     private Map<String,String> requestDataMap = new HashMap<>();
     private DataPublisher dataPublisher = new DataPublisher();
 
-    public void parseFile(String fileName,String serviceName,boolean requestFile,String grayLogUrl) throws Exception{
+    public void parseFile(String fileName, String serviceName, boolean requestFile, String grayLogUrl,
+                          boolean publishResponseData) throws Exception{
         System.out.println(" In Parse File ");
         if(requestFile)
-            parseReqLogFile(fileName,serviceName,grayLogUrl);
+            parseReqLogFile(fileName,serviceName,grayLogUrl,publishResponseData);
         else
             parseAppLogFile(fileName,serviceName,grayLogUrl);
     }
@@ -74,7 +76,7 @@ public class LogParser {
         }
     }
 
-    public void parseReqLogFile(String fileName,String serviceName,String grayLogUrl) throws Exception {
+    public void parseReqLogFile(String fileName,String serviceName,String grayLogUrl,boolean publishResponseData) throws Exception {
         File file = new File(fileName);
         System.out.println("Reading File "+file);
         BufferedReader br = new BufferedReader(new FileReader(file));
@@ -103,7 +105,7 @@ public class LogParser {
                 gatherRequestData(line,">");
             }  else if (line.startsWith("<")) {
                 gatherRequestData(line,"<");
-            } else if (StringUtils.isNotEmpty(line)) {
+            } else if (StringUtils.isNotEmpty(line) && publishResponseData) {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
                     Map<String, String> map = mapper.readValue(line, Map.class);
@@ -113,7 +115,8 @@ public class LogParser {
                     //we parse json objects in request, not list of json array thats in response, so just ignore for now
                     //ex.printStackTrace();
                     requestDataMap.put("data", "not-available");
-                    System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
+                    //System.out.println("Exception Parsing: "+fileName+" : Line number "+lineNumber);
+                    //System.out.println(ex.getMessage());
                 }
             } else if (StringUtils.isEmpty(line)) {
                 dataPublisher.sendPost(requestDataMap,grayLogUrl);

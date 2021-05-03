@@ -1,29 +1,34 @@
 logparser.environment=prod
 
-logparser.enabledServices= messenger-prod,\
-    caos-prod,\
-    qilin-prod,\
-    rad-prod,\
-    Transit-prod,\
-    agenda-prod,\
+logparser.enabledServices=SortationServices-prod,\
     lmx-prod,\
-    SortationServices-prod,\
-    Alamo-Prod,\
-    retail-config-prod,\
-    Tesseract-prod,\
-    hei-prod,\
-    oegr-prod,\
-    EARP-prod,\
     switchboard-prod,\
-    gazetteer-prod,\
-    edim-prod,\
-    tathastu-prod,\
-    jarvis-prod,\
+    qilin-prod,\
+    EARP-prod,\
+    rad-prod,\
     redeux-prod,\
-    ReportsGen-prod
-
-logparser.notEnabledServicesList=
+    Tesseract-prod,\
+    worldview-prod,\
+    Alamo-prod,\
+    worldListener-prod,\
+    oegr-prod,\
+    agenda-prod,\
+    edim-prod,\
+    hei-prod,\
+    jarvis-prod,\
+    messenger-prod,\
+    ReportsGen-prod,\
     geocoder-prod,\
+    edim-backend-prod,\
+    mileview-prod,\
+    mvb-backend-prod,\
+    finance-prod,\
+    worldListener-prod,\
+    mvb-frontend-prod,\
+    external-notification-prod
+
+# just post response codes for these services, as load is too large with response data size etc
+logparser.enabledServicesNoData =  geocoder-prod,\
     edim-backend-prod,\
     mileview-prod,\
     mvb-backend-prod,\

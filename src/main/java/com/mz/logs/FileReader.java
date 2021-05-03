@@ -16,34 +16,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileReader {
-    EnvProperties envProperties;
 
-    //e.g. "/Tesseract-prod/prod"
-    private EnvProperties getEnvProperties() {
-        List<String> enabledServicesList = new ArrayList<>();
-        EnvProperties envProperties = new EnvProperties();
-        try (InputStream input = FileReader.class.getClassLoader().getResourceAsStream("service.properties")) {
-            Properties prop = new Properties();
-            prop.load(input);
-            envProperties = EnvProperties.builder()
-                    .environment(prop.getProperty("logparser.environment"))
-                    .allServices(prop.getProperty("logparser.enabledServices"))
-                    .grayLogUrl(prop.getProperty("graylog.url"))
-                    .build();
-            for (String str : envProperties.getAllServices().split(","))
-                enabledServicesList.add(str);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        System.out.println(" Env:" + envProperties.getEnvironment());
-        List<String> pathList = new ArrayList<>();
-        for (String serviceName : enabledServicesList) {
-            pathList.add("/" + serviceName + "/" + envProperties.getEnvironment());
-            System.out.println("/" + serviceName + "/" + envProperties.getEnvironment());
-        }
-        envProperties.setAllServicesPath(pathList);
-        return envProperties;
-    }
+    private EnvProperties envProperties;
+
     public static void main(String[] args) throws Exception {
         //(new FileReader()).test();
         (new FileReader()).start();
@@ -51,7 +26,7 @@ public class FileReader {
 
     private void test() throws Exception {
         (new LogParser()).parseFile("/work/MZ/LogParser/test-req-1.log",
-                "test-service", true, "http://graylog.stage.milezero.com:8080/gelf");
+                "test-service", true, "http://graylog.stage.milezero.com:8080/gelf",true);
     }
 
     private void start() {
@@ -93,8 +68,10 @@ public class FileReader {
                     (new LogParser()).parseFile(fileName,
                             serviceName.toLowerCase(),
                             fileName.contains("request"),
-                            envProperties.getGrayLogUrl());
+                            envProperties.getGrayLogUrl(),
+                            !envProperties.getEnabledServicesNoData().contains(serviceName));
                 } catch (Exception ex) {
+                    ex.printStackTrace();
                     System.out.println(" Exception in Start() ");
                 }
             });
@@ -135,7 +112,7 @@ public class FileReader {
                     if(parseAllFiles)
                         parse(files,serviceName);
                     else {
-                        parse(files.stream().filter(s->s.contains("applicaiton")).collect(Collectors.toList()),
+                        parse(files.stream().filter(s->s.contains("application")).collect(Collectors.toList()),
                                 serviceName);
                     }
                     break;
