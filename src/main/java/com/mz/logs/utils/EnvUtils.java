@@ -13,7 +13,7 @@ public class EnvUtils {
 
     public static EnvProperties getEnvProperties() {
         List<String> enabledServicesList = new ArrayList<>();
-        List<String> enabledServicesNoDataList = new ArrayList<>();
+        List<String> disabledServicesList = new ArrayList<>();
         EnvProperties envProperties = new EnvProperties();
         try (InputStream input = FileReader.class.getClassLoader().getResourceAsStream("service.properties")) {
             Properties prop = new Properties();
@@ -25,8 +25,8 @@ public class EnvUtils {
                     .build();
             for (String str : envProperties.getAllServices().split(","))
                 enabledServicesList.add(str);
-            for (String str : prop.getProperty("logparser.enabledServicesNoData").split(","))
-                enabledServicesNoDataList.add(str);
+            /*for (String str : prop.getProperty("logparser.disabledServices").split(","))
+                disabledServicesList.add(str);*/
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -36,10 +36,10 @@ public class EnvUtils {
             String pathSuffix = envProperties.getEnvironment().equals("prod")?"prod":"staging";
             pathList.add("/" + serviceName + "/" + pathSuffix);
             System.out.println("/" + serviceName + "/" + pathSuffix);
-            System.out.println(" Publish Data:" + !enabledServicesNoDataList.contains(serviceName));
+            System.out.println(" Publish Data:" + !disabledServicesList.contains(serviceName));
         }
         envProperties.setAllServicesPath(pathList);
-        envProperties.setEnabledServicesNoData(enabledServicesNoDataList);
+        //envProperties.setDisabledServices(disabledServicesList);
         return envProperties;
     }
 

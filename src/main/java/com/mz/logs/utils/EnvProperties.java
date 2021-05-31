@@ -14,7 +14,6 @@ import java.util.List;
 public class EnvProperties {
     private String environment;
     private String allServices;
-    private List<String> enabledServicesNoData;
     private List<String> allServicesPath;
     private String grayLogUrl;
 }

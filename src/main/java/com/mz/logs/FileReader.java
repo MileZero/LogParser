@@ -69,7 +69,8 @@ public class FileReader {
                             serviceName.toLowerCase(),
                             fileName.contains("request"),
                             envProperties.getGrayLogUrl(),
-                            !envProperties.getEnabledServicesNoData().contains(serviceName));
+                            true
+                            /*!envProperties.getEnabledServicesNoData().contains(serviceName)*/);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     System.out.println(" Exception in Start() ");
