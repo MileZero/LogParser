@@ -44,7 +44,12 @@ sudo cp elasticsearch.yml /etc/elasticsearch/elasticsearch.yml
 links 10.1.23.180:8080/gettingstarted
 
 #elastic search
-sudo systemctl stop elasticsearch.service
+sudo systemctl start elasticsearch.service
 
 #graylog
-sudo systemctl restart graylog-server
+sudo systemctl start graylog-server
+
+#Note
+graylog is setup on one box only, ES is set up on 6 boxes
+If more boxes are added, add it server.conf  [elasticsearch_hosts]
+similarly add it on elasticsearch.yml [discovery.zen.ping.unicast.hosts:]

@@ -42,35 +42,28 @@ public class LogParser {
         String line;
         String stackTrace="";
         boolean hasStackTrace=false;
+        int lineCount=0;
         while (true) {
             line = br.readLine();
-            if(line==null) {
-                //file rotated
-                if(!file.exists()) {
-                    System.out.println("File Rotated, Closing Parser:");
-                    dataPublisher.close();
-                    System.exit(0);
-                }
-                //sleep for 5 seconds and keep trying
-                //System.out.println("Pausing:");
-                Thread.sleep(1000);
-                continue;
-            }
-            if(line.contains(LogFormat.STACK_TRACE_PREFIX)||line.contains(LogFormat.STACK_TRACE_CONTINUE)) {
+            //File Rotated or no data
+            if(line==null)
+                return;
+            if(line.contains(LogFormat.STACK_TRACE_PREFIX)||line.contains(LogFormat.STACK_TRACE_CONTINUE) && lineCount <3 ) {
                 hasStackTrace=true;
                 requestDataMap.put("service_name",serviceName);
-                //System.out.println("Raw Data:" + line);
                 stackTrace = stackTrace + "\n" + line;
+                lineCount++;
             }
             else {
                 if(hasStackTrace) {
-                    //System.out.println(stackTrace);
+                    System.out.println(stackTrace);
                     requestDataMap.put("file_type", "error_logs");
                     requestDataMap.put("stack_trace", stackTrace);
                     dataPublisher.sendPost(requestDataMap,grayLogUrl);
                     stackTrace = "";
                     requestDataMap.clear();
                     hasStackTrace = false;
+                    lineCount=0;
                 }
             }
         }
