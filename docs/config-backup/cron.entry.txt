@@ -24,3 +24,5 @@ sudo crontab -e to add entries
 #
 # m h  dom mon dow   command
 1 0-23 * * * /home/rishi/logParser.sh
+10,20,40,50 * * * * /usr/bin/python3.8 /home/rishi/serviceErrors.py > /home/rishi/output.log 2>&1
+

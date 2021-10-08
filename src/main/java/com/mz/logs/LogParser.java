@@ -56,7 +56,7 @@ public class LogParser {
             }
             else {
                 if(hasStackTrace) {
-                    System.out.println(stackTrace);
+                    //System.out.println(stackTrace);
                     requestDataMap.put("file_type", "error_logs");
                     requestDataMap.put("stack_trace", stackTrace);
                     dataPublisher.sendPost(requestDataMap,grayLogUrl);

@@ -36,6 +36,7 @@ public class FileReader {
         for (String servicePath : envProperties.getAllServicesPath()) {
             String serviceName = ParserUtils.getServiceName(servicePath);
             String path = ParserUtils.getServiceFullPath(servicePath);
+            System.out.println(path);
             List<String> files = getLogFiles(path);
             //no log files yet, or app log yet
             if (files == null) {
@@ -48,10 +49,10 @@ public class FileReader {
             System.out.println(files);
             parse(files, serviceName);
         }
-        if (EnvUtils.isStage(envProperties.getEnvironment())) {
+        /*if (EnvUtils.isStage(envProperties.getEnvironment())) {
             retryFailures(failurePaths,true);
             retryFailures(failurePathsAppLog,false);
-        }
+        }*/
     }
 
     private void retryFailures(List<String> fileNames,boolean parseAllFiles) {
