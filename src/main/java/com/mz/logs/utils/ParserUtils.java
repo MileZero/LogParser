@@ -18,9 +18,11 @@ public class ParserUtils {
         LocalDateTime ldt = DateTimeUtils.getDateTimeUTC();
         String hour = ldt.getHour() > 9 ? "" + ldt.getHour() : "0" + ldt.getHour();
         String month = ldt.getMonthValue()+"";
-        month = month.length()>=1?month:String.format("%01d" , month);
+        String day = ldt.getDayOfMonth()+"";
+        month = month.length()>1?month:String.format("%02d" , Integer.parseInt(month));
+        day = String.format("%02d" , Integer.parseInt(day));
         return
-                EnvUtils.BASE_PATH + ldt.getYear()+"/"+ldt.getMonthValue()+"/0"+ldt.getDayOfMonth() + "/" + hour + servicePath;
+                EnvUtils.BASE_PATH + ldt.getYear()+"/"+month+"/"+day + "/" + hour + servicePath;
 
     }
 

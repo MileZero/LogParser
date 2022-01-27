@@ -8,4 +8,19 @@ sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main"
 sudo apt update
 sudo apt install elasticsearch
 
---ES Cluster
+
+
+
+-Graylog logs
+/var/log/graylog-server/server.log
+
+#elastic search
+sudo systemctl restart elasticsearch.service
+
+#graylog
+sudo systemctl start graylog-server
+
+#config files
+
+sudo cp server.conf /etc/graylog/server/server.conf
+sudo cp elasticsearch.yml /etc/elasticsearch/elasticsearch.yml

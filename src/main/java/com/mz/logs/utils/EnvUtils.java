@@ -36,7 +36,7 @@ public class EnvUtils {
             String pathSuffix = envProperties.getEnvironment().equals("prod")?"prod":"staging";
             pathList.add("/" + serviceName + "/" + pathSuffix);
             System.out.println("/" + serviceName + "/" + pathSuffix);
-            System.out.println(" Publish Data:" + !disabledServicesList.contains(serviceName));
+            //System.out.println(" Publish Data:" + !disabledServicesList.contains(serviceName));
         }
         envProperties.setAllServicesPath(pathList);
         //envProperties.setDisabledServices(disabledServicesList);

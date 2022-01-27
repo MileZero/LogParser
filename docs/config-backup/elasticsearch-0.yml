@@ -21,8 +21,8 @@ cluster.name: graylog
 #
 # Use a descriptive name for the node:
 #
-node.name: node-3
-node.data: true
+node.name: node-1
+node.master: true
 #define nodes 1 2,4 data nodes:
 #node.data: true
 #
@@ -56,7 +56,7 @@ path.logs: /var/log/elasticsearch
 #
 # Set the bind address to a specific IP (IPv4 or IPv6):
 #
-network.host: 10.1.27.54
+network.host: 10.1.23.130
 #
 # Set a custom port for HTTP:
 #
@@ -69,11 +69,11 @@ network.host: 10.1.27.54
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 #
-discovery.zen.ping.unicast.hosts: ["10.1.23.227","10.1.21.11","10.1.27.54","10.1.18.254","10.1.23.128","10.1.25.52"]
+discovery.zen.ping.unicast.hosts: ["10.1.23.130","10.1.26.241","10.1.18.164"]
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of master-eligible nodes / 2 + 1):
 #
-discovery.zen.minimum_master_nodes: 2
+discovery.zen.minimum_master_nodes: 1
 #
 # For more information, consult the zen discovery module documentation.
 #

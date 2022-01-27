@@ -18,8 +18,7 @@ public class AppLogParser {
 
     private void start() {
         this.envProperties = EnvUtils.getEnvProperties();
-        List<String> allServicesList = Arrays.asList("/SortationServices-prod/prod");
-        for (String servicePath : allServicesList/*envProperties.getAllServicesPath()*/) {
+        for (String servicePath : envProperties.getAllServicesPath()) {
             String serviceName = ParserUtils.getServiceName(servicePath);
             String path = ParserUtils.getServiceFullPath(servicePath);
             List<String> files = ParserUtils.getLogFiles(path);

@@ -1,0 +1,24 @@
+--Installation
+
+sudo apt update
+sudo apt-get install openjdk-8-jre-headless apt-transport-https uuid-runtime dirmngr
+
+-MongoDB
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
+#ubuntu 16.04
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+#ubuntu 18.04
+echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
+
+sudo apt update
+sudo apt install mongodb-org
+sudo systemctl stop mongod.service
+sudo systemctl start mongod.service
+sudo systemctl enable mongod.service
+sudo systemctl status mongod
+
+cd /tmp
+wget https://packages.graylog2.org/repo/packages/graylog-3.0-repository_latest.deb
+sudo dpkg -i graylog-3.0-repository_latest.deb
+sudo apt update
+sudo apt install graylog-server

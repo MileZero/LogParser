@@ -25,14 +25,14 @@ public class FileReader {
     }
 
     private void test() throws Exception {
-        (new LogParser()).parseFile("/work/MZ/LogParser/test-req-1.log",
-                "test-service", true, "http://graylog.stage.milezero.com:8080/gelf",true);
+        (new LogParser()).parseFile("/work/MZ/LogParser/test-req.log",
+                "test-service", true, "http://graylog.prod.milezero.com:8080/gelf",true);
     }
 
     private void start() {
         this.envProperties = EnvUtils.getEnvProperties();
         List<String> failurePaths = new ArrayList<>();
-        List<String> failurePathsAppLog = new ArrayList<>();
+        //List<String> failurePathsAppLog = new ArrayList<>();
         for (String servicePath : envProperties.getAllServicesPath()) {
             String serviceName = ParserUtils.getServiceName(servicePath);
             String path = ParserUtils.getServiceFullPath(servicePath);
@@ -44,8 +44,8 @@ public class FileReader {
                 continue;
             }
             //app logs created only on exceptions
-            if(!files.contains("application"))
-                failurePathsAppLog.add(servicePath);
+            /*if(!files.contains("application"))
+                failurePathsAppLog.add(servicePath);*/
             System.out.println(files);
             parse(files, serviceName);
         }

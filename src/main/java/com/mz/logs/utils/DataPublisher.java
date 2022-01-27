@@ -17,6 +17,7 @@ public class DataPublisher {
     private CloseableHttpClient httpClient = HttpClients.createDefault();
     public void sendPost(Map<String,String> requestDataMap,String grayLogUrl) {
         try {
+            System.out.println(" In Send Post ");
             requestDataMap.put("short_message", UUID.randomUUID().toString());
             HttpPost httpPost = new HttpPost(grayLogUrl);
             String json = getJson(requestDataMap);
@@ -26,8 +27,8 @@ public class DataPublisher {
             httpPost.setHeader("Content-type", "application/json");
             CloseableHttpResponse response = httpClient.execute(httpPost);
             //assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
-            //System.out.println(" Posting to " +grayLogUrl+" for "+requestDataMap.get("service_name"));
-            //System.out.println(" Posting "+json);
+            System.out.println(" Posting to " +grayLogUrl+" for "+requestDataMap.get("service_name"));
+            System.out.println(" Posting "+json);
         }catch (Exception ex) {
            System.out.println(" Write failed ");
         }
